@@ -1,4 +1,3 @@
-const require = createRequire(import.meta.url);
 import axios from "axios";
 import csvParser from "csv-parser";
 import createCsvWriter from "csv-writer";
@@ -7,10 +6,10 @@ import * as fs from "fs";
 import { createRequire } from "module";
 import path from "path";
 import { URL } from "url";
-const { parse } = require("node-html-parser");
-const natural = require("natural");
+import { parse } from "node-html-parser";
+import natural from "natural";
 const WordTokenizer = natural.WordTokenizer;
-const { Configuration, OpenAIApi } = require("openai");
+import { Configuration, OpenAIApi } from "openai";
 
 dotenv.config();
 
