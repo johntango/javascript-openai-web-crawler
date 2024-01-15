@@ -187,9 +187,10 @@ async function getRelevantTokens(tokens) {
   let response;
   try {
     console.log("initiating openai api call");
-    response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt,
+
+    response = await openai.completions.create({
+      model: "gpt-3.5-turbo-instruct",
+      prompt: prompt,
       max_tokens: 50,
       n: 1,
       stop: null,
@@ -255,7 +256,7 @@ async function getEmbeddings(tokens) {
   let response;
   try {
     console.log("initiating openai api call");
-    response = await openai.createEmbedding({
+    response = await openai.embeddings.create({
       model: "text-embedding-ada-002",
       input: tokens,
     });
@@ -292,6 +293,7 @@ function cosineSimilarity(a, b) {
  */
 async function calculateSimilarityScores(inputText, crawledData) {
   console.log("start calculateSimilarityScores");
+  if(!inputText) inputText = "What are LunarMail services?";
   const inputTokens = await tokenizeContent(inputText);
   const inputRelevantTokens = await getRelevantTokens(inputTokens);
   const inputEmbedding = await getEmbeddings(inputRelevantTokens)[0];
@@ -361,14 +363,13 @@ async function answerQuestion(inputText, crawledData) {
   } else {
     prompt = promptStart;
   }
-
   // Call the OpenAI API
   let apiResponse;
   try {
     console.log("initiating openai api call");
-    apiResponse = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt,
+    apiResponse = await openai.completions.create({
+      model: "gpt-3.5-turbo-instruct",
+      prompt: prompt,
       max_tokens: 1000,
       n: 1,
       stop: null,
