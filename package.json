@@ -21,7 +21,7 @@
     "jsdom": "^21.1.1",
     "natural": "^6.2.0",
     "node-html-parser": "^6.1.5",
-    "openai": "^3.2.1",
+    "openai": "^4.24.7",
     "parse-domain": "^7.0.1",
     "stream": "0.0.2",
     "tiktoken": "0.0.1",

@@ -9,16 +9,14 @@ import { URL } from "url";
 import { parse } from "node-html-parser";
 import natural from "natural";
 const WordTokenizer = natural.WordTokenizer;
-import { Configuration, OpenAIApi } from "openai";
+import { OpenAI } from "openai";
 
 dotenv.config();
 
 const inputText = process.argv[2]; // parse the third command line argument as the question
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 const domain = "lunarmail.io";
 const fullUrl = "https://lunarmail.io";
@@ -174,7 +172,7 @@ async function getRelevantTokens(tokens) {
 
   // calculate the tokens available for the actual content
   const availableTokens = 4096 - promptStart.length - promptEnd.length;
-  
+
   let prompt;
   if (tokenString.length > availableTokens) {
     // cut the string to fit available tokens
@@ -199,7 +197,7 @@ async function getRelevantTokens(tokens) {
   } catch (e) {
     console.error(
       "Error calling OpenAI API getRelevantTokens createCompletion:",
-      e?.response?.data?.error
+      e?.response?.error
     );
     throw new Error(
       "Error calling OpenAI API getRelevantTokens createCompletion"
@@ -209,7 +207,7 @@ async function getRelevantTokens(tokens) {
   console.log("finished getRelevantTokens");
 
   // Extract and return the relevant tokens from the response
-  const relevantTokensText = response?.data?.choices[0].text.trim();
+  const relevantTokensText = response?.choices[0].text.trim();
   const relevantTokens = relevantTokensText.split(" ");
   console.log(relevantTokens);
   return relevantTokens;
@@ -293,7 +291,7 @@ function cosineSimilarity(a, b) {
  */
 async function calculateSimilarityScores(inputText, crawledData) {
   console.log("start calculateSimilarityScores");
-  if(!inputText) inputText = "What are LunarMail services?";
+  if (!inputText) inputText = "What are LunarMail services?";
   const inputTokens = await tokenizeContent(inputText);
   const inputRelevantTokens = await getRelevantTokens(inputTokens);
   const inputEmbedding = await getEmbeddings(inputRelevantTokens)[0];
@@ -355,7 +353,7 @@ async function answerQuestion(inputText, crawledData) {
   // Prepare the prompt for OpenAI's Codex
   const promptStart = `Answer the question based on the context below, and if the question can't be answered based on the context, say "I don't know"\n\nContext: ${strippedContent}\n\n---\n\nQuestion: ${inputText}\nAnswer:`;
   const availableTokens = 4096 - promptStart.length;
-  
+
   let prompt;
   if (strippedContent.length > availableTokens) {
     // cut the string to fit available tokens
@@ -378,14 +376,15 @@ async function answerQuestion(inputText, crawledData) {
   } catch (e) {
     console.error(
       "Error calling OpenAI API answerQuestion createCompletion:",
-      e.response.data.error
+      e.response.error
     );
     throw new Error("Error calling OpenAI API answerQuestion createCompletion");
   }
 
   console.log("finish answerQuestion");
   // Extract and return the answer from the response
-  const answer = apiResponse?.data?.choices[0]?.text?.trim();
+  const answer = apiResponse?.choices[0]?.text?.trim();
+
   return answer;
 }
 
